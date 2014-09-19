@@ -110,28 +110,29 @@
     unlike[4] =  B00000000;
     unlike[5] =  B01111110;
     unlike[6] =  B00000000;
-    unlike[7] =  B00000000;
-    
-    //  อีโมชั่น  //
-    emo1[0] =  B11100111;
-    emo1[1] =  B00000000;
-    emo1[2] =  B00100100;
-    emo1[3] =  B00000000;
-    emo1[4] =  B10000001;
-    emo1[5] =  B11111111;
-    emo1[6] =  B00000000;
-    emo1[7] =  B00000000;
-    
-    emo2[0] =  B11100111;
-    emo2[1] =  B00000000;
-    emo2[2] =  B00100100;
-    emo2[3] =  B00000000;
-    emo2[4] =  B10000001;
-    emo2[5] =  B11111111;
-    emo2[6] =  B00111100;
-    emo2[7] =  B00011000;
-    
-    emo3[0] =  B00000000;
+    unlike[7] =  B00000000;										
+
+    //  อีโมชั่น   //
+    //  C  //
+    emo1[0] =  B01111110;        
+    emo1[1] =  B01000010;
+    emo1[2] =  B01000010;
+    emo1[3] =  B01000000;
+    emo1[4] =  B01000000;
+    emo1[5] =  B01000010;
+    emo1[6] =  B01000010;
+    emo1[7] =  B01111110;
+    //  M  //
+    emo2[0] =  B10000001;
+    emo2[1] =  B11000011;
+    emo2[2] =  B10100101;
+    emo2[3] =  B10011001;
+    emo2[4] =  B10011001;
+    emo2[5] =  B10000001;
+    emo2[6] =  B10000001;
+    emo2[7] =  B10000001;
+    //  X  //
+    emo3[0] =  B00000000;        
     emo3[1] =  B00000000;
     emo3[2] =  B00000000;
     emo3[3] =  B00000000;
@@ -139,25 +140,6 @@
     emo3[5] =  B00000000;
     emo3[6] =  B00000000;
     emo3[7] =  B00000000;
-    
-    emo4[0] =  B00000000;
-    emo4[1] =  B00000000;
-    emo4[2] =  B00000000;
-    emo4[3] =  B00000000;
-    emo4[4] =  B00000000;
-    emo4[5] =  B00000000;
-    emo4[6] =  B00000000;
-    emo4[7] =  B00000000;
-    
-    emo5[0] =  B00000000;
-    emo5[1] =  B00000000;
-    emo5[2] =  B00000000;
-    emo5[3] =  B00000000;
-    emo5[4] =  B00000000;
-    emo5[5] =  B00000000;
-    emo5[6] =  B00000000;
-    emo5[7] =  B00000000;
-    
 
   }
   
@@ -165,23 +147,27 @@
   void loop() 
   {
     
-    if(millis()-timepg > 1000) {
-      timepg = millis();    
-      
+    if(millis()-timepg > 500) {
+      timepg = millis(); 
       frame++;
-      if (frame > 5) frame = 0 ;
-       
-      if(frame == 1 ) screenInput(emo1);
-      if(frame == 2 ) screenInput(emo2);
-      if(frame == 3 ) screenInput(emo3);
-      if(frame == 4 ) screenInput(emo4);
-      if(frame == 5 ) screenInput(emo5);
+
+      if(frame == 1 ) screenInput(emo1);  // C
+      if(frame == 2 ) screenInput(emo3);  // X
+      if(frame == 3 ) screenInput(emo2);  // M
+      if(frame == 4 ) screenInput(emo3);  // X
+      if(frame == 5 ) screenInput(emo2);  // M
+      if(frame == 6 ) screenInput(emo3);  // X
+      if(frame == 7 ) screenInput(emo1);  // C
+      if(frame == 8 ) screenInput(emo3);  // X
+     
+      if (frame > 8) frame = 0;
+      
     }
-
-
+    
     if(digitalRead(8) == 0){
       screenInput(angry);
-      servo.write(90);
+      servo.write(150);
+      frame = 0;
     }
     else{
       servo.write(0);
