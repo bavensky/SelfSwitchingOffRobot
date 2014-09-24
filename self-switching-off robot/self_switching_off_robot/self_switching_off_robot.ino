@@ -10,23 +10,32 @@
    * Date     : 14/09/2014 [dd/mm/yyyy]                                          *
    *******************************************************************************/
   #include <Servo.h>
-  Servo servo;
+  Servo mainservo;
+  Servo doorservo;
+  Servo lostservo;
   
   int clockPin = 13;  // Pin connected to SH_CP 
   int latchPin = 12;  // Pin connected to ST_CP 
   int dataPin = 11;   // Pin connected to DS 
   
-  int buzzer = 0;
   int count = 0;
   int led[8];
   int frame = 0;
+  int r=500, l=0, u=0, s=0;
+  
+  long z;
+  unsigned long timepg;
   
   int incorrect[8];  
   int smile[8];
   int minismile[8];
   int kiss[8];
-  int angry[8];
+  int angry1[8];
+  int angry2[8];
+  int angry3[8];
   int unlike[8];
+  int cry[8];
+
   
   int emo1[8];
   int emo2[8];
@@ -34,23 +43,21 @@
   int emo4[8];
   int emo5[8];
   
-  unsigned long timepg;
-                
-  
   void setup() 
   {
     // Serial begin on baud rate 9600 //
     Serial.begin(9600);
-    
+    randomSeed(analogRead(0));
     // Set Servo //
-    servo.attach(9);
+    mainservo.attach(9);
+    doorservo.attach(10);
     // Set pin input //
     pinMode(8 , INPUT_PULLUP);
     // Set pin output //
     pinMode(latchPin, OUTPUT);  
     pinMode(clockPin, OUTPUT);  
     pinMode(dataPin, OUTPUT);
-    servo.write(0);
+    mainservo.write(0);
     
     //  กากบาท  //
     incorrect[0] =  B10000001;
@@ -75,8 +82,8 @@
     //  ยิ้มมุมปาก  //
     minismile[0] =  B11100111;
     minismile[1] =  B00000000;
-    minismile[2] =  B01000010;
-    minismile[3] =  B00000000;
+    minismile[2] =  B01100110;
+    minismile[3] =  B01100110;
     minismile[4] =  B00000000;
     minismile[5] =  B00000010;
     minismile[6] =  B00000100;
@@ -92,24 +99,54 @@
     kiss[6] =  B00100000;
     kiss[7] =  B00111000;
     
-    //  โกรษ  //
-    angry[0] =  B00000000;
-    angry[1] =  B11100111;
-    angry[2] =  B00000000;
-    angry[3] =  B01100110;
-    angry[4] =  B01100110;
-    angry[5] =  B00000000;
-    angry[6] =  B00111100;
-    angry[7] =  B01000010; 
+    //  โกรษ นิด ๆ   //
+    angry1[0] =  B01000010;
+    angry1[1] =  B00100100;
+    angry1[2] =  B00011000;
+    angry1[3] =  B01100110;
+    angry1[4] =  B01100110;
+    angry1[5] =  B00000000;
+    angry1[6] =  B00111100;
+    angry1[7] =  B00000000; 
     
+    //  โกรษ มาก  //
+    angry2[0] =  B01000010;
+    angry2[1] =  B00100100;
+    angry2[2] =  B00011000;
+    angry2[3] =  B01100110;
+    angry2[4] =  B01100110;
+    angry2[5] =  B00000000;
+    angry2[6] =  B00111100;
+    angry2[7] =  B01000010; 
+   
+    //  โกรษ มาก ๆ  //
+    angry3[0] =  B00000000;
+    angry3[1] =  B11100111;
+    angry3[2] =  B00000000;
+    angry3[3] =  B01100110;
+    angry3[4] =  B01100110;
+    angry3[5] =  B00000000;
+    angry3[6] =  B00111100;
+    angry3[7] =  B01000010;  
+    
+    //  ร้องไห้   //
+    cry[0] =  B10000001;
+    cry[1] =  B01000010;
+    cry[2] =  B00100100;
+    cry[3] =  B01000010;
+    cry[4] =  B10000001;
+    cry[5] =  B00000000;
+    cry[6] =  B00111100;
+    cry[7] =  B01000010;
+
     //  ไม่ชอบ  //
     unlike[0] =  B00000000;
-    unlike[1] =  B01100110;
+    unlike[1] =  B00000000;
     unlike[2] =  B01100110;
-    unlike[3] =  B00000000;
+    unlike[3] =  B01100110;
     unlike[4] =  B00000000;
-    unlike[5] =  B01111110;
-    unlike[6] =  B00000000;
+    unlike[5] =  B00000000;
+    unlike[6] =  B01111110;
     unlike[7] =  B00000000;										
 
     //  อีโมชั่น   //
@@ -140,17 +177,35 @@
     emo3[5] =  B00000000;
     emo3[6] =  B00000000;
     emo3[7] =  B00000000;
-
+    //  Big eye  //
+    emo4[0] =  B00000000;        
+    emo4[1] =  B01000010;
+    emo4[2] =  B10100101;
+    emo4[3] =  B10100101;
+    emo4[4] =  B10100101;
+    emo4[5] =  B01000010;
+    emo4[6] =  B00000000;
+    emo4[7] =  B00111100;
+    //  smile eye  //
+    emo5[0] =  B00000000;        
+    emo5[1] =  B00000000;
+    emo5[2] =  B00000000;
+    emo5[3] =  B11100111;
+    emo5[4] =  B00000000;
+    emo5[5] =  B00000000;
+    emo5[6] =  B00000000;
+    emo5[7] =  B00111100;
+    u=1;
   }
   
   
   void loop() 
   {
     
+  if(u==1){  
     if(millis()-timepg > 500) {
       timepg = millis(); 
       frame++;
-
       if(frame == 1 ) screenInput(emo1);  // C
       if(frame == 2 ) screenInput(emo3);  // X
       if(frame == 3 ) screenInput(emo2);  // M
@@ -158,29 +213,128 @@
       if(frame == 5 ) screenInput(emo2);  // M
       if(frame == 6 ) screenInput(emo3);  // X
       if(frame == 7 ) screenInput(emo1);  // C
-      if(frame == 8 ) screenInput(emo3);  // X
-     
-      if (frame > 8) frame = 0;
-      
+      if(frame == 8 ) screenInput(emo3);  // X 
+      if(frame > 8) frame=0;
     }
-    
+  }
+  
+  if(u==2){  
+    if(millis()-timepg > 500) {
+      timepg = millis(); 
+      frame++;
+      if(frame == 1 ) screenInput(emo4);     
+      if(frame == 2 ) screenInput(emo5);  
+      if(frame == 3 ) screenInput(emo4);
+      if(frame == 4 ) screenInput(emo5);  
+      if(frame == 5 ) screenInput(emo4);
+      if(frame == 6 ) screenInput(emo5);
+      if(frame == 7 ) screenInput(emo4);
+      if(frame > 7){ frame=0;}  
+    }
+  }
+  
+  if(u==3 ){
+  screenInput(smile);
+  }
+  if(u==4 ){
+  screenInput(minismile);
+  }
+  if(u==5 ){
+  screenInput(cry);
+  }
+
+
+
+  /*********** Working ***********/
     if(digitalRead(8) == 0){
-      screenInput(angry);
-      servo.write(150);
-      frame = 0;
+      step1(); 
+      u++;
     }
     else{
-      servo.write(0);
+      mainservo.write(0);
+      doorservo.write(10);
     }
-    
     
     // show dot matrix //
     screenUpdate();
     
+  } // End loop //
+  
+  void step1()
+  {
+      doorservo.write(90);
+      mainservo.write(150);
+      
+      r = r-100; 
+      for(int k=0; k<r; k++){
+        screenInput(angry2);
+        screenUpdate();
+      }
+      if(r == 0){
+        r = 100;
+        l = 1;
+      }
+      if(l == 1){
+        mainservo.write(120);
+        for(int k=0; k<1000; k++){
+          screenInput(angry3);
+          screenUpdate();
+        }
+        mainservo.write(150);
+        l=2;
+        r=500;
+      }
+      if(l == 2){
+        screenInput(angry3);
+        screenUpdate();
+        if(u>5) u=0;
+        mainservo.write(0);
+        doorservo.write(10);
+        l=3;
+      }
+      while(l == 3){
+        step2();
+      }
+    frame = 0;
   }
   
+  void step2()
+  {
+   
+     if(digitalRead(8) == 0){
+      doorservo.write(90);
+      mainservo.write(150);
+      z = random(300);
+      
+      for(int k=0; k<z; k++){
+        screenInput(angry2);
+        screenUpdate();
+      }
+      
+      if(z > 250){
+      mainservo.write(120);
+      doorservo.write(90);
+      
+      for(int k=0; k<1000; k++){
+        screenInput(minismile);
+        screenUpdate();
+      }
+      doorservo.write(10);
+      mainservo.write(150);
+      z=0;
+      }  
+    }
+    else if(digitalRead(8) == 1){
+      screenInput(angry2);
+      screenUpdate();
+      mainservo.write(0);
+      doorservo.write(10);
+    }
+    
+  }
   
-  /******  Input information *****/
+  /************************ Dot Matrix Display ****************************/
+    /******  Input information *****/
   void screenInput(int data[8])
   {
       for(int i=0; i<=7; i++)
@@ -232,4 +386,3 @@
     //stop shifting
     digitalWrite(clockPin, LOW);
   }
-
