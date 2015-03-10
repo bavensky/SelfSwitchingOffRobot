@@ -43,6 +43,12 @@
   int emo4[8];
   int emo5[8];
   
+  int _r[8];
+  int _m[8];
+  int _u[8];
+  int _t[8];
+  int _l[8];
+  
   void setup() 
   {
     // Serial begin on baud rate 9600 //
@@ -150,6 +156,69 @@
     unlike[7] =  B00000000;										
 
     //  อีโมชั่น   //
+    //  R  //
+    _r[0] =  B00000000; 
+    _r[1] =  B01111100;        
+    _r[2] =  B01100100;
+    _r[3] =  B01100100;
+    _r[4] =  B01111000;
+    _r[5] =  B01110000;
+    _r[6] =  B01101000;
+    _r[7] =  B01100100;
+
+    /*_r[0] =  B01111000; 
+    _r[1] =  B01000100;        
+    _r[2] =  B01000100;
+    _r[3] =  B01001000;
+    _r[4] =  B01110000;
+    _r[5] =  B01001000;
+    _r[6] =  B01001000;
+    _r[7] =  B01001000;*/
+    
+
+
+    //  M  //
+    _m[0] =  B00000000; 
+    _m[1] =  B01000010;        
+    _m[2] =  B01100110;
+    _m[3] =  B01011010;
+    _m[4] =  B01000010;
+    _m[5] =  B01000010;
+    _m[6] =  B01000010;
+    _m[7] =  B01000010;
+    
+    //  U  //
+    _u[0] =  B00000000; 
+    _u[1] =  B01000010;        
+    _u[2] =  B01000010;
+    _u[3] =  B01000010;
+    _u[4] =  B01000010;
+    _u[5] =  B01000010;
+    _u[6] =  B01100110;
+    _u[7] =  B00111100;
+
+    //  T  //
+    _t[0] =  B00000000; 
+    _t[1] =  B01111110;        
+    _t[2] =  B01111110;
+    _t[3] =  B00011000;
+    _t[4] =  B00011000;
+    _t[5] =  B00011000;
+    _t[6] =  B00011000;
+    _t[7] =  B00011000;
+    
+    //  L  //
+    _l[0] =  B00000000; 
+    _l[1] =  B00110000;        
+    _l[2] =  B00110000;
+    _l[3] =  B00110000;
+    _l[4] =  B00110000;
+    _l[5] =  B00110000;
+    _l[6] =  B00111100;
+    _l[7] =  B00111100;
+
+
+
     //  C  //
     emo1[0] =  B01111110;        
     emo1[1] =  B01000010;
@@ -168,6 +237,7 @@
     emo2[5] =  B10000001;
     emo2[6] =  B10000001;
     emo2[7] =  B10000001;
+    
     //  X  //
     emo3[0] =  B00000000;        
     emo3[1] =  B00000000;
@@ -202,23 +272,25 @@
   void loop() 
   {
     
-  if(u==1){  
+  if(u==1)  {  
     if(millis()-timepg > 500) {
       timepg = millis(); 
       frame++;
-      if(frame == 1 ) screenInput(emo1);  // C
+      if(frame == 1 ) screenInput(_r);  // C
       if(frame == 2 ) screenInput(emo3);  // X
-      if(frame == 3 ) screenInput(emo2);  // M
+      if(frame == 3 ) screenInput(_m);  // M
       if(frame == 4 ) screenInput(emo3);  // X
-      if(frame == 5 ) screenInput(emo2);  // M
+      if(frame == 5 ) screenInput(_u);  // M
       if(frame == 6 ) screenInput(emo3);  // X
-      if(frame == 7 ) screenInput(emo1);  // C
+      if(frame == 7 ) screenInput(_t);  // C
       if(frame == 8 ) screenInput(emo3);  // X 
-      if(frame > 8) frame=0;
+      if(frame == 9 ) screenInput(_l);
+      if(frame == 10 ) screenInput(emo3);
+      if(frame > 10) frame=0;
     }
   }
   
-  if(u==2){  
+  if(u==2)  {  
     if(millis()-timepg > 500) {
       timepg = millis(); 
       frame++;
@@ -233,13 +305,13 @@
     }
   }
   
-  if(u==3 ){
+  if(u==3 )  {
   screenInput(smile);
   }
-  if(u==4 ){
+  if(u==4 )  {
   screenInput(minismile);
   }
-  if(u==5 ){
+  if(u==5 )  {
   screenInput(cry);
   }
 
@@ -304,28 +376,29 @@
      if(digitalRead(8) == 0){
       doorservo.write(90);
       mainservo.write(150);
-      z = random(300);
+      z = random(200);
       
       for(int k=0; k<z; k++){
-        screenInput(angry2);
+        screenInput(cry);
         screenUpdate();
       }
-      
-      if(z > 250){
+     
+      if(z > 195){
       mainservo.write(120);
       doorservo.write(90);
       
       for(int k=0; k<1000; k++){
-        screenInput(minismile);
+        screenInput(incorrect);
         screenUpdate();
       }
       doorservo.write(10);
       mainservo.write(150);
       z=0;
-      }  
+      }
+      
     }
     else if(digitalRead(8) == 1){
-      screenInput(angry2);
+      screenInput(emo4);
       screenUpdate();
       mainservo.write(0);
       doorservo.write(10);
